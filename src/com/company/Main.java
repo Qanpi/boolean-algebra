@@ -39,15 +39,15 @@ public class Main {
         System.out.println(i);
     }
 
-    public static void hw5() {
-
-    }
-
     public static boolean hw6(int a) {
         if (a<=1) return false;
         for (int i=2; i<Math.sqrt(a); i++) {
             if (a % i == 0) return false;
         }
         return true;
+    }
+
+    public static boolean hw7(boolean A, boolean B) {
+        return !(A ^ B); //or just A == B
     }
 }
