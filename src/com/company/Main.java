@@ -1,8 +1,44 @@
 package com.company;
 
+import java.io.*;
+import java.math.BigInteger;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
+import java.util.Random;
+import java.util.Scanner;
+import java.util.regex.Pattern;
+
 public class Main {
 
     public static void main(String[] args) {
+        try {
+            long a = 101;
+            count_time(a, false);
+            count_time(a, true);
+
+            a = Integer.MAX_VALUE;
+            count_time(a, false);
+            count_time(a, true);
+
+            a = Long.MAX_VALUE;
+            count_time(a, false);
+            count_time(a, true);
+
+        } catch (IOException e) {
+            System.err.println("Something went terribly wrong...");
+        }
+    }
+
+    public static void count_time(long a, boolean api) throws IOException {
+        long start = System.currentTimeMillis();
+        boolean isPrime = api ? hw61(a) : hw6(a);
+        long end = System.currentTimeMillis();
+
+        String func = api ? "API" : "normal";
+        System.out.printf("It took %d milliseconds for the %s prime function to determine if %d is prime: %b \n", end-start, func, a, isPrime);
     }
 
     public static boolean hw1(boolean weekday, boolean vacation) {
@@ -39,12 +75,37 @@ public class Main {
         System.out.println(i);
     }
 
-    public static boolean hw6(int a) {
+    public static boolean hw6(long a) {
         if (a<=1) return false;
-        for (int i=2; i<Math.sqrt(a); i++) {
+        for (long i=2; i<Math.sqrt(a); i++) {
             if (a % i == 0) return false;
         }
         return true;
+    }
+
+    public static boolean hw61(long a) throws IOException {
+        final String url = "http://compoasso.free.fr/primelistweb/page/prime/liste_online_en.php";
+        final String query = "numberInput=" + a;
+
+        URLConnection connection = new URL(url).openConnection();
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+        try (OutputStream output = connection.getOutputStream()) {
+            output.write(query.getBytes(StandardCharsets.UTF_8));
+        }
+
+        InputStream response = connection.getInputStream();
+        // int status = ((HttpURLConnection) connection).getResponseCode();
+
+        try (Scanner sc = new Scanner(response)) {
+            String pat = "<b>" + a + "</b>";
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();
+                if (line.contains(pat)) return true;
+            }
+        }
+        return false;
     }
 
     public static boolean hw7(boolean A, boolean B) {
